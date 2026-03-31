@@ -19,7 +19,7 @@ st.set_page_config(
     page_title="CollegeScope",
     page_icon="🏫",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # SVG fond scolaire — défini une fois, réutilisé partout
@@ -367,28 +367,48 @@ def page_dashboard():
         st.session_state["page"] = "accueil"
         st.rerun()
 
-    with st.sidebar:
-        st.markdown(f"**📍 {label}**")
-        if st.button("← Changer d'adresse", use_container_width=True):
-            st.session_state["page"] = "accueil"
-            st.rerun()
-        st.divider()
+    # ── Bandeau horizontal ────────────────────────────────────────────────────
+    st.markdown("""
+    <div style="background:white;border-bottom:1px solid #e5e7eb;
+                padding:0.6rem 0;margin-bottom:1rem;">
+    </div>
+    """, unsafe_allow_html=True)
 
+    b1, b2, b3, b4, b5, b6, b7, b8 = st.columns([3, 1, 1, 1, 1, 1, 1, 1], gap="small")
+
+    with b1:
+        nouvelle_adresse = st.text_input(
+            "", placeholder=f"📍 {label}",
+            label_visibility="collapsed", key="adresse_bandeau"
+        )
+        if nouvelle_adresse and len(nouvelle_adresse) >= 3:
+            suggestions = geocoder(nouvelle_adresse)
+            if suggestions:
+                for s in suggestions[:3]:
+                    if st.button(s["label"], key=f"band_sug_{s['label']}", use_container_width=True):
+                        st.session_state["adresse_selectionnee"] = s
+                        lat = s["lat"]
+                        lon = s["lon"]
+                        label = s["label"]
+                        st.rerun()
+
+    with b2:
         rayon_defaut = rayon_auto(lat, lon)
         rayon = st.select_slider(
-            "Rayon",
-            options=[2, 5, 10],
-            value=rayon_defaut,
-            format_func=lambda x: f"{x} km"
+            "Rayon", options=[2, 5, 10], value=rayon_defaut,
+            format_func=lambda x: f"{x} km",
+            label_visibility="collapsed"
         )
-        st.divider()
 
-        st.markdown("**Critères de notation**")
-        c_mixite     = st.checkbox("Mixité sociale",          value=True)
-        c_inclusion  = st.checkbox("Inclusion",               value=True)
-        c_enseign    = st.checkbox("Langues",                 value=True)
-        c_reputation = st.checkbox("Avis",                    value=True)
-        c_niveau     = st.checkbox("Niveau",                  value=True)
+    with b3: c_mixite     = st.checkbox("Mixité",    value=True)
+    with b4: c_inclusion  = st.checkbox("Inclusion", value=True)
+    with b5: c_enseign    = st.checkbox("Langues",   value=True)
+    with b6: c_reputation = st.checkbox("Avis",      value=True)
+    with b7: c_niveau     = st.checkbox("Niveau",    value=True)
+    with b8:
+        if st.button("← Accueil", use_container_width=True):
+            st.session_state["page"] = "accueil"
+            st.rerun()
 
     criteres_actifs = []
     if c_mixite:     criteres_actifs.append("mixite")
@@ -652,5 +672,7 @@ if "page" not in st.session_state:
 
 if st.session_state["page"] == "accueil":
     page_accueil()
+else:
+    page_dashboard()
 else:
     page_dashboard()
