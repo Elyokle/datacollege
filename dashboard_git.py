@@ -24,6 +24,8 @@ st.set_page_config(
 
 st.logo("logoleurecole.png", size="large")
 
+
+
 # SVG fond scolaire — défini une fois, réutilisé partout
 FOND_SCOLAIRE = """
 <style>
@@ -308,7 +310,6 @@ def calculer_score(row, criteres_actifs):
 # ─── PAGE ACCUEIL ─────────────────────────────────────────────────────────────
 
 def page_accueil():
-    st.markdown(LOGO_CSS, unsafe_allow_html=True)
     col_left, col_right = st.columns([1.1, 0.9], gap="large")
 
     with col_left:
@@ -377,7 +378,6 @@ def page_dashboard():
         st.session_state["page"] = "accueil"
         st.rerun()
 
-    st.markdown(LOGO_CSS, unsafe_allow_html=True)
 
     # ── Bandeau horizontal ────────────────────────────────────────────────────
     st.markdown("""
