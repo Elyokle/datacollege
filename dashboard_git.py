@@ -10,17 +10,35 @@ import pandas as pd
 import requests
 import math
 import folium
+import base64
+import os
 from streamlit_folium import st_folium
 
 GEOCODE_URL = "https://api-adresse.data.gouv.fr/search/"
 SUPABASE_URL = "https://lnuuvjwdmsyjvaljlnky.supabase.co"
 
 st.set_page_config(
-    page_title="CollegeScope",
+    page_title="Leur École",
     page_icon="🏫",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+def get_logo_b64():
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logoleurecole.png")
+    try:
+        with open(logo_path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    except Exception:
+        return None
+
+LOGO_B64 = get_logo_b64()
+
+LOGO_HTML = f'''
+<div style="position:fixed;top:0.6rem;right:1.2rem;z-index:9999;">
+    <img src="data:image/png;base64,{LOGO_B64}" height="55" style="opacity:0.92;">
+</div>
+''' if LOGO_B64 else ""
 
 # SVG fond scolaire — défini une fois, réutilisé partout
 FOND_SCOLAIRE = """
@@ -299,6 +317,7 @@ def calculer_score(row, criteres_actifs):
 # ─── PAGE ACCUEIL ─────────────────────────────────────────────────────────────
 
 def page_accueil():
+    st.markdown(LOGO_HTML, unsafe_allow_html=True)
     col_left, col_right = st.columns([1.1, 0.9], gap="large")
 
     with col_left:
@@ -366,6 +385,8 @@ def page_dashboard():
     if not lat:
         st.session_state["page"] = "accueil"
         st.rerun()
+
+    st.markdown(LOGO_HTML, unsafe_allow_html=True)
 
     # ── Bandeau horizontal ────────────────────────────────────────────────────
     st.markdown("""
