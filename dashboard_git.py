@@ -19,7 +19,7 @@ st.set_page_config(
     page_title="Leur École",
     page_icon="🏫",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 st.logo("logoleurecole.png", size="large")
@@ -379,9 +379,16 @@ def page_dashboard():
         st.rerun()
 
 
-    # ── Barre adresse en haut ─────────────────────────────────────────────────
-    col_addr, col_retour = st.columns([5, 1], gap="small")
-    with col_addr:
+    # ── Bandeau horizontal ────────────────────────────────────────────────────
+    st.markdown("""
+    <div style="background:white;border-bottom:1px solid #e5e7eb;
+                padding:0.6rem 0;margin-bottom:1rem;">
+    </div>
+    """, unsafe_allow_html=True)
+
+    b1, b2, b3, b4, b5, b6, b7, b8 = st.columns([3, 1, 1, 1, 1, 1, 1, 1], gap="small")
+
+    with b1:
         nouvelle_adresse = st.text_input(
             "Nouvelle adresse", placeholder=f"📍 {label}",
             label_visibility="collapsed", key="adresse_bandeau"
@@ -396,27 +403,24 @@ def page_dashboard():
                         lon = s["lon"]
                         label = s["label"]
                         st.rerun()
-    with col_retour:
-        if st.button("← Accueil", use_container_width=True):
-            st.session_state["page"] = "accueil"
-            st.rerun()
 
-    # ── Sidebar — logo + filtres ───────────────────────────────────────────────
-    with st.sidebar:
-        st.logo("logoleurecole.png", size="large")
-        st.divider()
+    with b2:
         rayon_defaut = rayon_auto(lat, lon)
         rayon = st.select_slider(
             "Rayon", options=[2, 5, 10], value=rayon_defaut,
-            format_func=lambda x: f"{x} km"
+            format_func=lambda x: f"{x} km",
+            label_visibility="collapsed"
         )
-        st.divider()
-        st.markdown("**Critères de notation**")
-        c_mixite     = st.checkbox("Mixité sociale",          value=True)
-        c_inclusion  = st.checkbox("Inclusion",               value=True)
-        c_enseign    = st.checkbox("Langues",                 value=True)
-        c_reputation = st.checkbox("Avis",                    value=True)
-        c_niveau     = st.checkbox("Niveau",                  value=True)
+
+    with b3: c_mixite     = st.checkbox("Mixité",    value=True)
+    with b4: c_inclusion  = st.checkbox("Inclusion", value=True)
+    with b5: c_enseign    = st.checkbox("Langues",   value=True)
+    with b6: c_reputation = st.checkbox("Avis",      value=True)
+    with b7: c_niveau     = st.checkbox("Niveau",    value=True)
+    with b8:
+        if st.button("← Accueil", use_container_width=True):
+            st.session_state["page"] = "accueil"
+            st.rerun()
 
     criteres_actifs = []
     if c_mixite:     criteres_actifs.append("mixite")
@@ -487,7 +491,7 @@ def page_dashboard():
                     box-shadow:0 2px 12px rgba(0,0,0,0.08);
                     border:1px solid #e5e7eb;margin-bottom:0.3rem">
         """, unsafe_allow_html=True)
-        st_folium(m, use_container_width=True, height=500)
+        st_folium(m, use_container_width=True, height=320)
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("""
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.3rem">
