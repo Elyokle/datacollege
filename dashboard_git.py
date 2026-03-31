@@ -26,9 +26,11 @@ st.set_page_config(
 
 def get_logo_b64():
     try:
-        with open("logoleurecole.png", "rb") as f:
-            return base64.b64encode(f.read()).decode()
-    except Exception:
+        from pathlib import Path
+        logo_path = Path(__file__).parent / "logoleurecole.png"
+        return base64.b64encode(logo_path.read_bytes()).decode()
+    except Exception as e:
+        st.write(f"Debug logo: {e}")  # temporaire pour voir l'erreur
         return None
 
 LOGO_B64 = get_logo_b64()
