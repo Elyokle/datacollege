@@ -25,9 +25,8 @@ st.set_page_config(
 )
 
 def get_logo_b64():
-    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logoleurecole.png")
     try:
-        with open(logo_path, "rb") as f:
+        with open("logoleurecole.png", "rb") as f:
             return base64.b64encode(f.read()).decode()
     except Exception:
         return None
