@@ -25,21 +25,31 @@ st.set_page_config(
 )
 
 def get_logo_b64():
-    try:
-        from pathlib import Path
-        logo_path = Path(__file__).parent / "logoleurecole.png"
-        return base64.b64encode(logo_path.read_bytes()).decode()
-    except Exception as e:
-        st.write(f"Debug logo: {e}")  # temporaire pour voir l'erreur
-        return None
+    from pathlib import Path
+    tentatives = [
+        Path("logoleurecole.png"),
+        Path(__file__).parent / "logoleurecole.png",
+        Path("/mount/src/datacollege/logoleurecole.png"),
+    ]
+    for p in tentatives:
+        try:
+            if p.exists():
+                return base64.b64encode(p.read_bytes()).decode(), str(p)
+        except Exception:
+            pass
+    return None, "fichier introuvable"
 
-LOGO_B64 = get_logo_b64()
+LOGO_B64, LOGO_DEBUG = get_logo_b64()
 
 LOGO_HTML = f'''
-<div style="position:fixed;top:0.6rem;right:1.2rem;z-index:9999;">
+<div style="position:fixed;top:0.6rem;right:1.2rem;z-index:9999;background:white;padding:4px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.1);">
     <img src="data:image/png;base64,{LOGO_B64}" height="55" style="opacity:0.92;">
 </div>
-''' if LOGO_B64 else ""
+''' if LOGO_B64 else f'''
+<div style="position:fixed;top:0.6rem;right:1.2rem;z-index:9999;background:#fee2e2;padding:6px 10px;border-radius:8px;font-size:11px;color:#991b1b;">
+    Logo introuvable : {LOGO_DEBUG}
+</div>
+'''
 
 # SVG fond scolaire — défini une fois, réutilisé partout
 FOND_SCOLAIRE = """
@@ -169,6 +179,14 @@ def supabase_query(table, select="*", limit=10000):
             break
         offset += page_size
     return pd.DataFrame(all_rows)
+
+def label_situation(dec):
+    """Traduit un décile IPS en label lisible."""
+    if dec is None: return None
+    if dec <= 4: return "Défavorisé"
+    if dec <= 7: return "Moyen"
+    return "Très favorisé"
+
 
 def geocoder(adresse):
     try:
@@ -333,7 +351,7 @@ def page_accueil():
         """, unsafe_allow_html=True)
 
         adresse_input = st.text_input(
-            "", placeholder="Entrez votre adresse...",
+            "Adresse", placeholder="Entrez votre adresse...",
             label_visibility="collapsed", key="adresse_input"
         )
 
@@ -400,7 +418,7 @@ def page_dashboard():
 
     with b1:
         nouvelle_adresse = st.text_input(
-            "", placeholder=f"📍 {label}",
+            "Nouvelle adresse", placeholder=f"📍 {label}",
             label_visibility="collapsed", key="adresse_bandeau"
         )
         if nouvelle_adresse and len(nouvelle_adresse) >= 3:
@@ -610,7 +628,7 @@ def page_dashboard():
                     mx  = r.get("mixite_sociale")
                     dec = r.get("situation_economique")
                     if mx:  lignes.append(f"Hétérogénéité : **{mx}**")
-                    if dec: lignes.append(f"Situation économique : décile **{int(dec)}/10**")
+                    if dec: lignes.append(f"Situation économique : **{label_situation(dec)}**")
                     if r.get("zone_qpv") == 1:
                         lignes.append("Zone QPV")
                     if r.get("taux_monoparentale"):
