@@ -674,5 +674,3 @@ if st.session_state["page"] == "accueil":
     page_accueil()
 else:
     page_dashboard()
-else:
-    page_dashboard()
