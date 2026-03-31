@@ -22,17 +22,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-LOGO_CSS = """
-<style>
-[data-testid="stSidebarNav"] {
-    background-image: url(https://raw.githubusercontent.com/Elyokle/datacollege/main/logoleurecole.png);
-    background-repeat: no-repeat;
-    background-position: left 1rem top 1rem;
-    background-size: 200px auto;
-    padding-top: 140px;
-}
-</style>
-"""
+st.logo("logoleurecole.png", size="large")
 
 # SVG fond scolaire — défini une fois, réutilisé partout
 FOND_SCOLAIRE = """
