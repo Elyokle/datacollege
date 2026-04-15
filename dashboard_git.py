@@ -264,8 +264,8 @@ def calculer_score(row, criteres_actifs):
 
     if "enseignements" in criteres_actifs:
         s = 0
-        lv1 = row.get("lv1") or ""
-        lv2 = row.get("lv2") or ""
+        lv1 = str(row.get("lv1") or "")
+        lv2 = str(row.get("lv2") or "")
         if "Allemand" in lv1:                 s += 1
         if "Allemand" in lv2:                 s += 1
         if row.get("section_internationale"):  s += 2
